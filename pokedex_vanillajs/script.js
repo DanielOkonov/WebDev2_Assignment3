@@ -3,7 +3,7 @@ let fullPokeList = [];
 let renderedPokeList = [];
 let pokeTypes = [];
 
-$("#load").on("click", async function () {
+$( document ).ready(async function() {
   $(".spinner-border").show();
 
   fullPokeList = await loadAllPokes();
