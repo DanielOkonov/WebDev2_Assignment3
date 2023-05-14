@@ -26,6 +26,13 @@ $("#pokeTypes").on("change", function () {
   renderPokeList();
 });
 
+$('#pokeDetailsModal').on('show.bs.modal', function (event) {
+  const id = $(event.relatedTarget).data('val');
+  const poke = renderedPokeList[id];
+  const pokeDescr = `Name: ${poke.name}; Weight: ${poke.weight}; Height: ${poke.height}; Type: ${poke.type};`
+  $(this).find(".modal-body").text(pokeDescr);
+});
+
 async function loadAllPokes() {
   const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=100");
   const body = await response.json();
@@ -40,6 +47,7 @@ async function loadAllPokes() {
     result.push({
       name: pokeDetails.name,
       weight: pokeDetails.weight,
+      height: pokeDetails.height,
       // get first type from types
       type: pokeDetails.types[0].type.name,
     });
@@ -63,23 +71,12 @@ async function loadPokeTypes() {
 function renderPokeList() {
   let html = "";
 
-  // renderedPokeList.forEach((poke) => {
-  //   html += `<div class="row">
-  //               <div class="col">${poke.name}</div>
-  //               <div class="col">${poke.weight}</div>
-  //               <div class="col">${poke.type}</div>
-  //               <div class="col"><button type="button" class="btn btn-link">details</button></div>
-  //           </div>`;
-  // });
-
   for(let i = 0; i < renderedPokeList.length; i++){
     const poke = renderedPokeList[i];
     html += `<div class="row" id="${i}">
                 <div class="col">${poke.name}</div>
-                <div class="col">${poke.weight}</div>
-                <div class="col">${poke.type}</div>
                 <div class="col">                
-                  <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#pokeDetailsModal" id="${i}">
+                  <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#pokeDetailsModal" data-val="${i}">
                     details
                   </button>                
                 </div>
