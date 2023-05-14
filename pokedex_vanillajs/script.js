@@ -29,7 +29,8 @@ $("#pokeTypes").on("change", function () {
 $('#pokeDetailsModal').on('show.bs.modal', function (event) {
   const id = $(event.relatedTarget).data('val');
   const poke = renderedPokeList[id];
-  const pokeDescr = `Name: ${poke.name}; Weight: ${poke.weight}; Height: ${poke.height}; Type: ${poke.type};`
+  $(this).find(".modal-title").text(poke.name);
+  const pokeDescr = `Weight: ${poke.weight}; Height: ${poke.height}; Type: ${poke.type};`
   $(this).find(".modal-body").text(pokeDescr);
 });
 
@@ -50,6 +51,7 @@ async function loadAllPokes() {
       height: pokeDetails.height,
       // get first type from types
       type: pokeDetails.types[0].type.name,
+      image: pokeDetails.sprites.front_default
     });
   }
   return result;
@@ -74,8 +76,9 @@ function renderPokeList() {
   for(let i = 0; i < renderedPokeList.length; i++){
     const poke = renderedPokeList[i];
     html += `<div class="row" id="${i}">
-                <div class="col">${poke.name}</div>
-                <div class="col">                
+                <div class="col-1"><img src="${poke.image}" style="width:70px;height:70px"></img></div>
+                <div class="col-2">${poke.name}</div>
+                <div class="col-3">                
                   <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#pokeDetailsModal" data-val="${i}">
                     details
                   </button>                
