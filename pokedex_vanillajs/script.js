@@ -20,7 +20,10 @@ $("#load").on("click", async function () {
 });
 
 $("#pokeTypes").on("change", function () {
-  alert("Type selected: " + $("#pokeTypes").val());
+  renderedPokeList = fullPokeList.filter(poke => {
+    return poke.type == $("#pokeTypes").val();
+  });
+  renderPokeList();
 });
 
 async function loadAllPokes() {
@@ -67,4 +70,5 @@ function renderPokeList() {
   });
 
   $("#list").html(html);
+  $("#totalNum").html(`Total number: ${renderedPokeList.length}`);
 }
