@@ -63,12 +63,33 @@ async function loadPokeTypes() {
 function renderPokeList() {
   let html = "";
 
-  renderedPokeList.forEach((poke) => {
-    html += `<div>
-                <p>${poke.name} - ${poke.weight} - ${poke.type} </p>
+  // renderedPokeList.forEach((poke) => {
+  //   html += `<div class="row">
+  //               <div class="col">${poke.name}</div>
+  //               <div class="col">${poke.weight}</div>
+  //               <div class="col">${poke.type}</div>
+  //               <div class="col"><button type="button" class="btn btn-link">details</button></div>
+  //           </div>`;
+  // });
+
+  for(let i = 0; i < renderedPokeList.length; i++){
+    const poke = renderedPokeList[i];
+    html += `<div class="row" id="${i}">
+                <div class="col">${poke.name}</div>
+                <div class="col">${poke.weight}</div>
+                <div class="col">${poke.type}</div>
+                <div class="col">                
+                  <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#pokeDetailsModal" id="${i}">
+                    details
+                  </button>                
+                </div>
             </div>`;
-  });
+  }
 
   $("#list").html(html);
   $("#totalNum").html(`Total number: ${renderedPokeList.length}`);
+}
+
+function showDetails(pokeId){
+  alert("show details for: " + pokeId);
 }
