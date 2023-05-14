@@ -7,6 +7,7 @@ $("#load").on("click", async function () {
   $(".spinner-border").show();
 
   fullPokeList = await loadAllPokes();
+  $("#totalNum").html(`Total: ${fullPokeList.length}`);
   renderedPokeList = fullPokeList;
   pokeTypes = await loadPokeTypes();
 
@@ -32,6 +33,7 @@ $('#pokeDetailsModal').on('show.bs.modal', function (event) {
   $(this).find(".modal-title").text(poke.name);
   const pokeDescr = `Weight: ${poke.weight}; Height: ${poke.height}; Type: ${poke.type};`
   $(this).find(".modal-body").text(pokeDescr);
+  $(this).find(".modal-image").attr("src", poke.image);
 });
 
 async function loadAllPokes() {
@@ -87,7 +89,7 @@ function renderPokeList() {
   }
 
   $("#list").html(html);
-  $("#totalNum").html(`Total number: ${renderedPokeList.length}`);
+  $("#shownNum").html(`Shown: ${renderedPokeList.length}`);
 }
 
 function showDetails(pokeId){
