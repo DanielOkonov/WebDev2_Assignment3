@@ -78,7 +78,7 @@ $('#pokeDetailsModal').on('show.bs.modal', function (event) {
 });
 
 async function loadAllPokes() {
-  const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=100");
+  const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=10000");
   const body = await response.json();
   const pokeArray = body.results;
 
@@ -150,7 +150,7 @@ function fillPagination(){
 }
 
 function renderPagination(pageId){
-  const numOfButtonToShow = 5;
+  const numOfButtonsToShow = 5;
 
   const pageSize = $('#pageSize').val(); 
   const numOfFiltered = filteredPokeList.length;
@@ -171,7 +171,7 @@ function renderPagination(pageId){
     $('.pagination > #next').removeClass('disabled');
   }
 
-  const lastVisiblePageId = firstVisiblePageId + numOfButtonToShow - 1;
+  const lastVisiblePageId = firstVisiblePageId + numOfButtonsToShow - 1;
   if(pageId < firstVisiblePageId){
     firstVisiblePageId--;
     lastVisiblePageId--;
