@@ -1,6 +1,6 @@
 
 let fullPokeList = [];
-let renderedPokeList = [];
+let filteredPokeList = [];
 let pokeTypes = [];
 
 $( document ).ready(async function() {
@@ -8,28 +8,43 @@ $( document ).ready(async function() {
 
   fullPokeList = await loadAllPokes();
   $("#totalNum").html(`Total: ${fullPokeList.length}`);
-  renderedPokeList = fullPokeList;
+  filteredPokeList = fullPokeList;
   pokeTypes = await loadPokeTypes();
 
   $.each(pokeTypes, function (i, pt) {
     $("#pokeTypes").append($("<option></option>").val(pt).html(pt));
   });
 
-  renderPokeList();
+  renderPage(0);
+  $("#filteredNum").html(`Filtered: ${filteredPokeList.length}`);
+  fillPagination($('#pageSize').val(), filteredPokeList.length);
 
   $(".spinner-border").hide();
 });
 
 $("#pokeTypes").on("change", function () {
-  renderedPokeList = fullPokeList.filter(poke => {
-    return poke.type == $("#pokeTypes").val();
-  });
-  renderPokeList();
+  if($("#pokeTypes").val() == "_all"){
+    filteredPokeList = fullPokeList;
+  }
+  else{
+    filteredPokeList = fullPokeList.filter(poke => {
+      return poke.type == $("#pokeTypes").val();
+    });
+  }
+
+  renderPage(0);
+  $("#filteredNum").html(`Filtered: ${filteredPokeList.length}`);
+  fillPagination($('#pageSize').val(), filteredPokeList.length);
+});
+
+$("#pageSize").on("change", function () {
+  renderPage(0);
+  fillPagination($('#pageSize').val(), filteredPokeList.length);
 });
 
 $('#pokeDetailsModal').on('show.bs.modal', function (event) {
   const id = $(event.relatedTarget).data('val');
-  const poke = renderedPokeList[id];
+  const poke = filteredPokeList[id];
   $(this).find(".modal-title").text(poke.name);
   const pokeDescr = `Weight: ${poke.weight}; Height: ${poke.height}; Type: ${poke.type};`
   $(this).find(".modal-body").text(pokeDescr);
@@ -72,11 +87,14 @@ async function loadPokeTypes() {
   return result;
 }
 
-function renderPokeList() {
+function renderPage(pageId) {
+  const pageSize = $('#pageSize').val();
   let html = "";
 
-  for(let i = 0; i < renderedPokeList.length; i++){
-    const poke = renderedPokeList[i];
+  const listToRender = filteredPokeList.slice(pageId * pageSize, (pageId + 1) * pageSize);
+
+  for(let i = 0; i < listToRender.length; i++){
+    const poke = listToRender[i];
     html += `<div class="row" id="${i}">
                 <div class="col-1"><img src="${poke.image}" style="width:70px;height:70px"></img></div>
                 <div class="col-2">${poke.name}</div>
@@ -88,8 +106,17 @@ function renderPokeList() {
             </div>`;
   }
 
-  $("#list").html(html);
-  $("#shownNum").html(`Shown: ${renderedPokeList.length}`);
+  $("#list").html(html);  
+}
+
+function fillPagination(pageSize, numOfFiltered){
+  const numOfPages = Math.ceil(numOfFiltered / pageSize);
+  $(".pagination").empty();
+  $(".pagination").append( "<li class='page-item'><a class='page-link' href='#'>Previous</a></li>");
+  for(let i = 0; i < numOfPages; i++){
+    $(".pagination").append( `<li class='page-item'><a class='page-link' href='#' id='${i}'>${i + 1}</a></li>`);
+  }  
+  $(".pagination").append( "<li class='page-item'><a class='page-link' href='#'>Next</a></li>");
 }
 
 function showDetails(pokeId){
