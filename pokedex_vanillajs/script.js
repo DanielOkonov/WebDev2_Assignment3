@@ -48,14 +48,28 @@ $("#pageSize").on("change", function () {
 
 $(".pagination").click(function(event){
   event.stopPropagation();
-  const pageId = parseInt(event.target.parentElement.id);
+  const liId = event.target.parentElement.id;
+  
+  let pageId = 0;
+  if(liId === 'prev'){
+    if(currentPageId === 0)
+      return;
+    pageId = currentPageId - 1;
+  } else if(liId === 'next'){
+    if(currentPageId === filteredPokeList.length - 1)
+      return;
+    pageId = currentPageId + 1;
+  } else {
+    pageId = parseInt(liId);
+  }
+
   renderPage(pageId);
   renderPagination(pageId);
 });
 
 $('#pokeDetailsModal').on('show.bs.modal', function (event) {
-  const id = $(event.relatedTarget).data('val');
-  const poke = filteredPokeList[id];
+  const name = $(event.relatedTarget).data('val');
+  const poke = filteredPokeList.find(poke => poke.name === name);
   $(this).find(".modal-title").text(poke.name);
   const pokeDescr = `Weight: ${poke.weight}; Height: ${poke.height}; Type: ${poke.type};`
   $(this).find(".modal-body").text(pokeDescr);
@@ -110,7 +124,7 @@ function renderPage(pageId) {
                 <div class="col-1"><img src="${poke.image}" style="width:70px;height:70px"></img></div>
                 <div class="col-2">${poke.name}</div>
                 <div class="col-3">                
-                  <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#pokeDetailsModal" data-val="${i}">
+                  <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#pokeDetailsModal" data-val="${poke.name}">
                     details
                   </button>                
                 </div>
@@ -125,11 +139,11 @@ function fillPagination(){
   const numOfFiltered = filteredPokeList.length;
   const numOfPages = Math.ceil(numOfFiltered / pageSize);
   $(".pagination").empty();
-  $(".pagination").append( "<li class='page-item'><a class='page-link' href='#'>Previous</a></li>");
+  $(".pagination").append( "<li class='page-item' id='prev'><a class='page-link' href='#'>Previous</a></li>");
   for(let i = 0; i < numOfPages; i++){
     $(".pagination").append( `<li class='page-item' id='${i}'><a class='page-link' href='#'>${i + 1}</a></li>`);
   }  
-  $(".pagination").append( "<li class='page-item'><a class='page-link' href='#'>Next</a></li>");
+  $(".pagination").append( "<li class='page-item' id='next'><a class='page-link' href='#'>Next</a></li>");
 
   currentPageId = 0;
 }
@@ -141,9 +155,15 @@ function renderPagination(pageId){
   const numOfFiltered = filteredPokeList.length;
   const numOfPages = Math.ceil(numOfFiltered / pageSize);    
 
-
   $(`.pagination > #${currentPageId}`).removeClass('active');
   $(`.pagination > #${pageId}`).addClass('active');
+
+  if(pageId === 0){
+    $('.pagination > #prev').addClass('disabled');
+  } else {
+    $('.pagination > #prev').removeClass('disabled');
+  }
+  
 
   currentPageId = pageId;
 }
