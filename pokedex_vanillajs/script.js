@@ -3,6 +3,7 @@ let fullPokeList = [];
 let filteredPokeList = [];
 let pokeTypes = [];
 let currentPageId = 0;
+let firstVisiblePageId = 0;
 
 $( document ).ready(async function() {
   $(".spinner-border").show();
@@ -141,7 +142,7 @@ function fillPagination(){
   $(".pagination").empty();
   $(".pagination").append( "<li class='page-item' id='prev'><a class='page-link' href='#'>Previous</a></li>");
   for(let i = 0; i < numOfPages; i++){
-    $(".pagination").append( `<li class='page-item' id='${i}'><a class='page-link' href='#'>${i + 1}</a></li>`);
+    $(".pagination").append( `<li class='page-item' id='${i}' style='display:none'><a class='page-link' href='#'>${i + 1}</a></li>`);
   }  
   $(".pagination").append( "<li class='page-item' id='next'><a class='page-link' href='#'>Next</a></li>");
 
@@ -163,11 +164,34 @@ function renderPagination(pageId){
   } else {
     $('.pagination > #prev').removeClass('disabled');
   }
+
+  if(pageId === numOfPages - 1){
+    $('.pagination > #next').addClass('disabled');
+  } else {
+    $('.pagination > #next').removeClass('disabled');
+  }
+
+  const lastVisiblePageId = firstVisiblePageId + numOfButtonToShow - 1;
+  if(pageId < firstVisiblePageId){
+    firstVisiblePageId--;
+    lastVisiblePageId--;
+  } else if (pageId > lastVisiblePageId){
+    firstVisiblePageId++;
+    lastVisiblePageId++;
+  }
   
+  $('.pagination').children('li').each(function() {
+    const id = parseInt($(this).attr('id'));
+
+    if(isNaN(id))
+      return;
+
+    if(firstVisiblePageId <= id && id <= lastVisiblePageId){
+      $(this).show();
+    } else {
+      $(this).hide();
+    }
+  });
 
   currentPageId = pageId;
-}
-
-function showDetails(pokeId){
-  alert("show details for: " + pokeId);
 }
