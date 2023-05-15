@@ -2,6 +2,7 @@
 let fullPokeList = [];
 let filteredPokeList = [];
 let pokeTypes = [];
+let currentPageId = 0;
 
 $( document ).ready(async function() {
   $(".spinner-border").show();
@@ -17,7 +18,8 @@ $( document ).ready(async function() {
 
   renderPage(0);
   $("#filteredNum").html(`Filtered: ${filteredPokeList.length}`);
-  fillPagination($('#pageSize').val(), filteredPokeList.length);
+  fillPagination();
+  renderPagination(0);
 
   $(".spinner-border").hide();
 });
@@ -34,12 +36,21 @@ $("#pokeTypes").on("change", function () {
 
   renderPage(0);
   $("#filteredNum").html(`Filtered: ${filteredPokeList.length}`);
-  fillPagination($('#pageSize').val(), filteredPokeList.length);
+  fillPagination();
+  renderPagination(0);
 });
 
 $("#pageSize").on("change", function () {
   renderPage(0);
-  fillPagination($('#pageSize').val(), filteredPokeList.length);
+  fillPagination();
+  renderPagination(0);
+});
+
+$(".pagination").click(function(event){
+  event.stopPropagation();
+  const pageId = parseInt(event.target.parentElement.id);
+  renderPage(pageId);
+  renderPagination(pageId);
 });
 
 $('#pokeDetailsModal').on('show.bs.modal', function (event) {
@@ -109,14 +120,32 @@ function renderPage(pageId) {
   $("#list").html(html);  
 }
 
-function fillPagination(pageSize, numOfFiltered){
+function fillPagination(){
+  const pageSize = $('#pageSize').val(); 
+  const numOfFiltered = filteredPokeList.length;
   const numOfPages = Math.ceil(numOfFiltered / pageSize);
   $(".pagination").empty();
   $(".pagination").append( "<li class='page-item'><a class='page-link' href='#'>Previous</a></li>");
   for(let i = 0; i < numOfPages; i++){
-    $(".pagination").append( `<li class='page-item'><a class='page-link' href='#' id='${i}'>${i + 1}</a></li>`);
+    $(".pagination").append( `<li class='page-item' id='${i}'><a class='page-link' href='#'>${i + 1}</a></li>`);
   }  
   $(".pagination").append( "<li class='page-item'><a class='page-link' href='#'>Next</a></li>");
+
+  currentPageId = 0;
+}
+
+function renderPagination(pageId){
+  const numOfButtonToShow = 5;
+
+  const pageSize = $('#pageSize').val(); 
+  const numOfFiltered = filteredPokeList.length;
+  const numOfPages = Math.ceil(numOfFiltered / pageSize);    
+
+
+  $(`.pagination > #${currentPageId}`).removeClass('active');
+  $(`.pagination > #${pageId}`).addClass('active');
+
+  currentPageId = pageId;
 }
 
 function showDetails(pokeId){
