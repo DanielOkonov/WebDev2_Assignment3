@@ -74,6 +74,8 @@ $("#pokeDetailsModal").on("show.bs.modal", function (event) {
 });
 
 async function loadAllPokes() {
+  const startTime = new Date();
+
   const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=100");
   const body = await response.json();
   const pokeArray = body.results;
@@ -93,6 +95,9 @@ async function loadAllPokes() {
       image: pokeDetails.sprites.front_default,
     });
   }
+
+  console.log(`Loaded ${result.length} in ${new Date() - startTime} ms`)
+
   return result;
 }
 
