@@ -1,11 +1,10 @@
-
 let fullPokeList = [];
 let filteredPokeList = [];
 let pokeTypes = [];
 let currentPageId = 0;
 let firstVisiblePageId = 0;
 
-$( document ).ready(async function() {
+$(document).ready(async function () {
   $(".spinner-border").show();
 
   fullPokeList = await loadAllPokes();
@@ -26,11 +25,10 @@ $( document ).ready(async function() {
 });
 
 $("#pokeTypes").on("change", function () {
-  if($("#pokeTypes").val() == "_all"){
+  if ($("#pokeTypes").val() == "_all") {
     filteredPokeList = fullPokeList;
-  }
-  else{
-    filteredPokeList = fullPokeList.filter(poke => {
+  } else {
+    filteredPokeList = fullPokeList.filter((poke) => {
       return poke.type == $("#pokeTypes").val();
     });
   }
@@ -47,18 +45,16 @@ $("#pageSize").on("change", function () {
   renderPagination(0);
 });
 
-$(".pagination").click(function(event){
+$(".pagination").click(function (event) {
   event.stopPropagation();
   const liId = event.target.parentElement.id;
-  
+
   let pageId = 0;
-  if(liId === 'prev'){
-    if(currentPageId === 0)
-      return;
+  if (liId === "prev") {
+    if (currentPageId === 0) return;
     pageId = currentPageId - 1;
-  } else if(liId === 'next'){
-    if(currentPageId === filteredPokeList.length - 1)
-      return;
+  } else if (liId === "next") {
+    if (currentPageId === filteredPokeList.length - 1) return;
     pageId = currentPageId + 1;
   } else {
     pageId = parseInt(liId);
@@ -68,17 +64,17 @@ $(".pagination").click(function(event){
   renderPagination(pageId);
 });
 
-$('#pokeDetailsModal').on('show.bs.modal', function (event) {
-  const name = $(event.relatedTarget).data('val');
-  const poke = filteredPokeList.find(poke => poke.name === name);
+$("#pokeDetailsModal").on("show.bs.modal", function (event) {
+  const name = $(event.relatedTarget).data("val");
+  const poke = filteredPokeList.find((poke) => poke.name === name);
   $(this).find(".modal-title").text(poke.name);
-  const pokeDescr = `Weight: ${poke.weight}; Height: ${poke.height}; Type: ${poke.type};`
+  const pokeDescr = `Weight: ${poke.weight}; Height: ${poke.height}; Type: ${poke.type};`;
   $(this).find(".modal-body").text(pokeDescr);
   $(this).find(".modal-image").attr("src", poke.image);
 });
 
 async function loadAllPokes() {
-  const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=10000");
+  const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=100");
   const body = await response.json();
   const pokeArray = body.results;
 
@@ -94,7 +90,7 @@ async function loadAllPokes() {
       height: pokeDetails.height,
       // get first type from types
       type: pokeDetails.types[0].type.name,
-      image: pokeDetails.sprites.front_default
+      image: pokeDetails.sprites.front_default,
     });
   }
   return result;
@@ -114,12 +110,15 @@ async function loadPokeTypes() {
 }
 
 function renderPage(pageId) {
-  const pageSize = $('#pageSize').val();
+  const pageSize = $("#pageSize").val();
   let html = "";
 
-  const listToRender = filteredPokeList.slice(pageId * pageSize, (pageId + 1) * pageSize);
+  const listToRender = filteredPokeList.slice(
+    pageId * pageSize,
+    (pageId + 1) * pageSize
+  );
 
-  for(let i = 0; i < listToRender.length; i++){
+  for (let i = 0; i < listToRender.length; i++) {
     const poke = listToRender[i];
     html += `<div class="row" id="${i}">
                 <div class="col-1"><img src="${poke.image}" style="width:70px;height:70px"></img></div>
@@ -132,66 +131,75 @@ function renderPage(pageId) {
             </div>`;
   }
 
-  $("#list").html(html);  
+  $("#list").html(html);
 }
 
-function fillPagination(){
-  const pageSize = $('#pageSize').val(); 
+function fillPagination() {
+  const pageSize = $("#pageSize").val();
   const numOfFiltered = filteredPokeList.length;
   const numOfPages = Math.ceil(numOfFiltered / pageSize);
   $(".pagination").empty();
-  $(".pagination").append( "<li class='page-item' id='prev'><a class='page-link' href='#'>Previous</a></li>");
-  for(let i = 0; i < numOfPages; i++){
-    $(".pagination").append( `<li class='page-item' id='${i}' style='display:none'><a class='page-link' href='#'>${i + 1}</a></li>`);
-  }  
-  $(".pagination").append( "<li class='page-item' id='next'><a class='page-link' href='#'>Next</a></li>");
+  $(".pagination").append(
+    "<li class='page-item' id='prev'><a class='page-link' href='#'>Previous</a></li>"
+  );
+  for (let i = 0; i < numOfPages; i++) {
+    $(".pagination").append(
+      `<li class='page-item' id='${i}' style='display:none'><a class='page-link' href='#'>${
+        i + 1
+      }</a></li>`
+    );
+  }
+  $(".pagination").append(
+    "<li class='page-item' id='next'><a class='page-link' href='#'>Next</a></li>"
+  );
 
   currentPageId = 0;
 }
 
-function renderPagination(pageId){
+function renderPagination(pageId) {
   const numOfButtonsToShow = 5;
 
-  const pageSize = $('#pageSize').val(); 
+  const pageSize = $("#pageSize").val();
   const numOfFiltered = filteredPokeList.length;
-  const numOfPages = Math.ceil(numOfFiltered / pageSize);    
+  const numOfPages = Math.ceil(numOfFiltered / pageSize);
 
-  $(`.pagination > #${currentPageId}`).removeClass('active');
-  $(`.pagination > #${pageId}`).addClass('active');
+  $(`.pagination > #${currentPageId}`).removeClass("active");
+  $(`.pagination > #${pageId}`).addClass("active");
 
-  if(pageId === 0){
-    $('.pagination > #prev').addClass('disabled');
+  if (pageId === 0) {
+    $(".pagination > #prev").addClass("disabled");
   } else {
-    $('.pagination > #prev').removeClass('disabled');
+    $(".pagination > #prev").removeClass("disabled");
   }
 
-  if(pageId === numOfPages - 1){
-    $('.pagination > #next').addClass('disabled');
+  if (pageId === numOfPages - 1) {
+    $(".pagination > #next").addClass("disabled");
   } else {
-    $('.pagination > #next').removeClass('disabled');
+    $(".pagination > #next").removeClass("disabled");
   }
 
   const lastVisiblePageId = firstVisiblePageId + numOfButtonsToShow - 1;
-  if(pageId < firstVisiblePageId){
+  if (pageId < firstVisiblePageId) {
     firstVisiblePageId--;
     lastVisiblePageId--;
-  } else if (pageId > lastVisiblePageId){
+  } else if (pageId > lastVisiblePageId) {
     firstVisiblePageId++;
     lastVisiblePageId++;
   }
-  
-  $('.pagination').children('li').each(function() {
-    const id = parseInt($(this).attr('id'));
 
-    if(isNaN(id))
-      return;
+  $(".pagination")
+    .children("li")
+    .each(function () {
+      const id = parseInt($(this).attr("id"));
 
-    if(firstVisiblePageId <= id && id <= lastVisiblePageId){
-      $(this).show();
-    } else {
-      $(this).hide();
-    }
-  });
+      if (isNaN(id)) return;
+
+      if (firstVisiblePageId <= id && id <= lastVisiblePageId) {
+        $(this).show();
+      } else {
+        $(this).hide();
+      }
+    });
 
   currentPageId = pageId;
 }
