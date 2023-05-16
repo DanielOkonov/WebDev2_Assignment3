@@ -8,7 +8,7 @@ $(document).ready(async function () {
   $(".spinner-border").show();
 
   fullPokeList = await loadAllPokes();
-  $("#totalNum").html(`Total: ${fullPokeList.length}`);
+
   filteredPokeList = fullPokeList;
   pokeTypes = await loadPokeTypes();
 
@@ -21,7 +21,7 @@ $(document).ready(async function () {
   fillPagination();
   renderPagination(0);
 
-  $(".spinner-border").hide();
+  $(".spinner-border").hide();  
 });
 
 $("#pokeTypes").on("change", function () {
@@ -68,33 +68,55 @@ $("#pokeDetailsModal").on("show.bs.modal", function (event) {
   const name = $(event.relatedTarget).data("val");
   const poke = filteredPokeList.find((poke) => poke.name === name);
   $(this).find(".modal-title").text(poke.name);
-  const pokeDescr = `Weight: ${poke.weight}; Height: ${poke.height}; Type: ${poke.type};`;
-  $(this).find(".modal-body").text(pokeDescr);
+  const pokeDescr = `<div>Weight: ${poke.weight}</div><br/><div>Height: ${poke.height}</div><br/><div>Type: ${poke.type}</div>`;
+  $(this).find(".modal-body").html(pokeDescr);
   $(this).find(".modal-image").attr("src", poke.image);
 });
 
 async function loadAllPokes() {
   const startTime = new Date();
 
-  const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=100");
+  const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=10000");
   const body = await response.json();
   const pokeArray = body.results;
 
+ 
+
+  const urls = pokeArray.map(poke => poke.url);
+
+  const requests = urls.map((url) => fetch(url));
+
   let result = [];
 
-  for (const poke of pokeArray) {
-    const response = await fetch(poke.url);
-    const pokeDetails = await response.json();
+  Promise.all(requests)
+    .then((responses) => {
+      const errors = responses.filter((response) => !response.ok);
 
-    result.push({
-      name: pokeDetails.name,
-      weight: pokeDetails.weight,
-      height: pokeDetails.height,
-      // get first type from types
-      type: pokeDetails.types[0].type.name,
-      image: pokeDetails.sprites.front_default,
+      if (errors.length > 0) {
+        throw errors.map((response) => Error(response.statusText));
+      }
+
+      const json = responses.map((response) => response.json());
+      return Promise.all(json);
+    })
+    .then((pokes) => {
+      pokes.forEach((pokeDetails) => 
+
+      //console.log(poke.name);
+      result.push({
+        name: pokeDetails.name,
+        weight: pokeDetails.weight,
+        height: pokeDetails.height,
+        // get first type from types
+        type: pokeDetails.types[0].type.name,
+        image: pokeDetails.sprites.front_default,
+      })
+
+      );
+    })
+    .catch((errors) => {
+      errors.forEach((error) => console.error(error));
     });
-  }
 
   console.log(`Loaded ${result.length} in ${new Date() - startTime} ms`)
 
