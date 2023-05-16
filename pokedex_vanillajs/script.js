@@ -118,7 +118,7 @@ async function loadAllPokes() {
       errors.forEach((error) => console.error(error));
     });
 
-  console.log(`Loaded ${result.length} in ${new Date() - startTime} ms`)
+  console.log(`Loaded in ${new Date() - startTime} ms`)
 
   return result;
 }
